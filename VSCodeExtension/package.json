@@ -1,0 +1,66 @@
+{
+  "name": "TickTime-vscode",
+  "displayName": "TickTime",
+  "description": "リポジトリごとの作業時間をMac内だけに記録します。",
+  "version": "0.1.0",
+  "publisher": "TickTime",
+  "icon": "icon.png",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "time tracking",
+    "wakatime",
+    "local",
+    "privacy"
+  ],
+  "activationEvents": [
+    "onStartupFinished",
+    "onCommand:TickTime.sendHeartbeat",
+    "onCommand:TickTime.openDashboard"
+  ],
+  "main": "./extension.js",
+  "scripts": {
+    "test": "node --test"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "TickTime.sendHeartbeat",
+        "title": "TickTime: 今すぐ記録する"
+      },
+      {
+        "command": "TickTime.openDashboard",
+        "title": "TickTime: ダッシュボードを開く"
+      }
+    ],
+    "configuration": {
+      "title": "TickTime",
+      "properties": {
+        "TickTime.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "リポジトリの作業時間を記録します。"
+        },
+        "TickTime.heartbeatIntervalSeconds": {
+          "type": "number",
+          "default": 15,
+          "minimum": 5,
+          "maximum": 60,
+          "description": "作業中に記録を書き出す間隔です。"
+        },
+        "TickTime.idleTimeoutSeconds": {
+          "type": "number",
+          "default": 120,
+          "minimum": 30,
+          "maximum": 1800,
+          "description": "VS Code内の操作がないとき、離席とみなすまでの秒数です。"
+        }
+      }
+    }
+  }
+}
