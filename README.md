@@ -3,6 +3,9 @@
 TickTimeは、作業時間をMac内だけに保存するWakaTime風のタイムトラッカーです。
 macOSアプリとVS Code拡張機能の2つで動きます。
 
+<img width="1094" height="987" alt="CleanShot 2026-07-22 at 11 35 04" src="https://github.com/user-attachments/assets/ec542b35-2ff9-4a67-b833-1af659c603bc" />
+
+
 ## できること
 
 - VS Codeで開いているリポジトリの作業時間を自動記録
