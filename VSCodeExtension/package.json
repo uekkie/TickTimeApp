@@ -2,7 +2,7 @@
   "name": "TickTime-vscode",
   "displayName": "TickTime",
   "description": "リポジトリごとの作業時間をMac内だけに記録します。",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "TickTime",
   "icon": "icon.png",
   "license": "MIT",
