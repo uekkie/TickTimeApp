@@ -1,4 +1,4 @@
 .build/
 .cache/
 dist/
-Releases/
+.DS_Store
