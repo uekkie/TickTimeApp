@@ -21,7 +21,7 @@ struct TickTimeApp: App {
     }
 
     var body: some Scene {
-        WindowGroup("TickTime", id: "dashboard") {
+        Window("TickTime", id: "dashboard") {
             DashboardView()
                 .environmentObject(store)
                 .environmentObject(settings)
