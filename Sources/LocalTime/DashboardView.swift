@@ -8,6 +8,7 @@ struct DashboardView: View {
     @EnvironmentObject private var monitor: ActivityMonitor
 
     @State private var showingClearConfirmation = false
+    @State private var projectPeriod: ProjectPeriod = .week
 
     private var allEntries: [ActivityEntry] {
         store.entries.filter { $0.project != nil && $0.repository != nil }
@@ -47,6 +48,24 @@ struct DashboardView: View {
         lastSevenDays.reduce(0) { $0 + $1.duration }
     }
 
+    private var projectPeriodInterval: (start: Date, end: Date) {
+        let end = monitor.now
+        let start = end.addingTimeInterval(-projectPeriod.duration)
+        return (start, end)
+    }
+
+    private var periodProjects: [ProjectDuration] {
+        ActivityAnalytics.durationByProject(
+            of: allEntries,
+            from: projectPeriodInterval.start,
+            to: projectPeriodInterval.end
+        )
+    }
+
+    private var periodTotalDuration: TimeInterval {
+        periodProjects.reduce(0) { $0 + $1.duration }
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
@@ -58,6 +77,7 @@ struct DashboardView: View {
                     appBreakdown
                 }
 
+                projectTotals
                 recentActivity
                 settingsPanel
             }
@@ -193,6 +213,48 @@ struct DashboardView: View {
         .frame(width: 340)
     }
 
+    private var projectTotals: some View {
+        Panel(title: "プロジェクト別累計", systemImage: "chart.pie.fill") {
+            VStack(alignment: .leading, spacing: 16) {
+                Picker("期間", selection: $projectPeriod) {
+                    ForEach(ProjectPeriod.allCases) { period in
+                        Text(period.title).tag(period)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+
+                HStack(alignment: .firstTextBaseline) {
+                    Text("合計")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Text(DurationText.compact(periodTotalDuration))
+                        .font(.title3.weight(.semibold))
+                        .monospacedDigit()
+                }
+
+                if periodProjects.isEmpty {
+                    ContentUnavailableView(
+                        "この期間の記録はありません",
+                        systemImage: "shippingbox",
+                        description: Text("選択した期間にリポジトリの記録がありません")
+                    )
+                    .frame(height: 160)
+                } else {
+                    VStack(spacing: 14) {
+                        ForEach(periodProjects) { project in
+                            ProjectDurationRow(
+                                project: project,
+                                longestDuration: periodProjects.first?.duration ?? 1
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private var recentActivity: some View {
         Panel(title: "最近の記録", systemImage: "list.bullet") {
             let recent = allEntries.sorted { $0.startedAt > $1.startedAt }
@@ -250,6 +312,30 @@ struct DashboardView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
+        }
+    }
+}
+
+private enum ProjectPeriod: String, CaseIterable, Identifiable {
+    case day
+    case week
+    case month
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .day: return "直近24時間"
+        case .week: return "直近7日"
+        case .month: return "直近30日"
+        }
+    }
+
+    var duration: TimeInterval {
+        switch self {
+        case .day: return 24 * 60 * 60
+        case .week: return 7 * 24 * 60 * 60
+        case .month: return 30 * 24 * 60 * 60
         }
     }
 }
